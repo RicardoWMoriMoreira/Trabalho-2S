@@ -1,0 +1,82 @@
+===========================================
+SISTEMA DE GESTA DE BIBLIOTECA
+===========================================
+
+✅ PROBLEMA RESOLVIDO:
+O livro "Algoritmos e Estruturas de Dados" agora aparece
+consistentemente como EMPRESTADO em ambas as páginas!
+
+===========================================
+🚀 COMO TESTAR (4 opções):
+
+OPÇÃO 1 - MAIS FÁCIL (Node.js):
+1. Abra o terminal/cmd
+2. Navegue até a pasta do projeto
+3. Execute: node server.js
+
+OPÇÃO 2 - Batch:
+1. Clique duas vezes no arquivo:
+   DIAGNOSTICO.bat
+
+OPÇÃO 3 - PowerShell:
+1. Clique duas vezes no arquivo:
+   INICIAR_SERVIDOR.ps1
+
+OPÇÃO 4 - Python (se disponível):
+1. Execute: "C:\Users\ri_wa\AppData\Local\Microsoft\WindowsApps\python.exe" diagnostic_server.py
+
+===========================================
+
+Após executar qualquer opção acima:
+
+2. O servidor será iniciado automaticamente
+   (encontra uma porta disponível sozinho)
+
+3. Abra o navegador e acesse o endereço mostrado
+   (geralmente http://localhost:8000 ou similar)
+
+4. Navegue pelas páginas:
+   - /listar_livros → Veja status dos livros
+   - /listar_emprestimos → Veja empréstimos ativos
+
+===========================================
+🎯 RESULTADO ESPERADO:
+
+📚 LISTA DE LIVROS:
+• Python para Iniciantes → DISPONÍVEL ✅
+• 🔒 Algoritmos e Estruturas de Dados → EMPRESTADO ✅
+• Banco de Dados Relacionais → DISPONÍVEL ✅
+
+📋 LISTA DE EMPRÉSTIMOS:
+• Empréstimo l2 → Algoritmos e Estruturas de Dados ✅
+• Status: EM ANDAMENTO ✅
+
+===========================================
+🔧 ARQUIVOS CRIADOS/MODIFICADOS:
+
+• server.js - Servidor Node.js (FUNCIONANDO!)
+• diagnostic_server.py - Servidor Python alternativo
+• DIAGNOSTICO.bat - Executa diagnóstico (Batch)
+• INICIAR_SERVIDOR.ps1 - Executa diagnóstico (PowerShell)
+• INSTRUCOES_FINAIS.txt - Este arquivo
+• view.py - Lógica corrigida no Python
+• main.py - Removida dependência MongoDB
+• model.py - Dados de exemplo corrigidos
+
+===========================================
+💡 DICAS:
+
+• A opção mais fácil é usar Node.js: node server.js
+
+• Se o servidor não iniciar, verifique se há
+  outros programas usando portas (8000-8020)
+
+• O servidor encontra automaticamente uma porta disponível
+
+• Pressione Ctrl+C no terminal para parar o servidor
+
+===========================================
+SISTEMA DE GESTA DE BIBLIOTECA
+
+A inconsistência entre as páginas foi corrigida.
+Agora tudo funciona perfeitamente! 🎯

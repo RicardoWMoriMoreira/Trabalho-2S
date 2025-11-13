@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão Bibliotecária - Portal Administrativo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.025em;
+        }
+
+        .header .subtitle {
+            font-size: 1.25em;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .header .institution {
+            font-size: 1em;
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: -40px auto 60px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+
+        .menu-section {
+            padding: 80px 60px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+            letter-spacing: -0.025em;
+        }
+
+        .section-title p {
+            font-size: 1.125em;
+            color: #64748b;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .menu-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 40px 32px;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #3b82f6;
+        }
+
+        .menu-card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .menu-card:hover .menu-card-icon {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: scale(1.05);
+        }
+
+        .menu-card h3 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+            letter-spacing: -0.025em;
+        }
+
+        .menu-card p {
+            color: #64748b;
+            margin-bottom: 32px;
+            font-size: 1em;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .menu-card a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(59, 130, 246, 0.3);
+        }
+
+        .menu-card a:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .footer {
+            background: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.95em;
+            border-top: 1px solid #334155;
+        }
+
+        .footer-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .footer .copyright {
+            font-size: 0.875em;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 40px 20px;
+            }
+
+            .header h1 {
+                font-size: 2.25em;
+            }
+
+            .header .subtitle {
+                font-size: 1.125em;
+            }
+
+            .menu-section {
+                padding: 50px 30px;
+            }
+
+            .section-title h2 {
+                font-size: 2em;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .menu-card {
+                padding: 32px 24px;
+            }
+        }
+
+        /* Subtle animations */
+        .menu-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .menu-card:nth-child(1) { animation-delay: 0.1s; }
+        .menu-card:nth-child(2) { animation-delay: 0.2s; }
+        .menu-card:nth-child(3) { animation-delay: 0.3s; }
+        .menu-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Sistema de Gestão Bibliotecária</h1>
+            <p class="subtitle">Portal Administrativo</p>
+            <p class="institution">Sistema profissional de gestão de acervo e empréstimos</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="menu-section">
+            <div class="section-title">
+                <h2>Painel de Controle</h2>
+                <p>Acesse os principais módulos do sistema de gestão bibliotecária</p>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Gestão de Usuários</h3>
+                    <p>Administre perfis de estudantes, professores e funcionários com controle de acesso e permissões.</p>
+                    <a href="/listar_usuarios">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Acessar Usuários</span>
+                    </a>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Catálogo de Livros</h3>
+                    <p>Gerencie o acervo bibliográfico com organização por categorias e controle de disponibilidade.</p>
+                    <a href="/listar_livros">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Explorar Livros</span>
+                    </a>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h3>Controle de Empréstimos</h3>
+                    <p>Monitore empréstimos ativos, devoluções pendentes e histórico de operações.</p>
+                    <a href="/listar_emprestimos">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Gerenciar Empréstimos</span>
+                    </a>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Relatórios e Analytics</h3>
+                    <p>Análises estatísticas, relatórios de uso e métricas de performance do sistema.</p>
+                    <a href="/relatorios">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Ver Relatórios</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <p><strong>Sistema de Gestão Bibliotecária</strong> - Versão 2024</p>
+            <p class="copyright">© 2024 Sistema desenvolvido para gestão eficiente de bibliotecas acadêmicas</p>
+        </div>
+    </div>
+
+</body>
+</html>

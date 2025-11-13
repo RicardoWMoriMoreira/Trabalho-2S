@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Biblioteca Integrado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Sistema de Gerenciamento de Biblioteca Integrado</h1>
+            <p class="subtitle">SGBU - Módulos Integrados</p>
+        </header>
+
+        <!-- Estatísticas Gerais -->
+        <section class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Total de Livros</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.disponivel }}</div>
+                <div class="stat-label">Disponíveis</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.emprestado }}</div>
+                <div class="stat-label">Emprestados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ usuarios|length }}</div>
+                <div class="stat-label">Usuários</div>
+            </div>
+        </section>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('usuarios')">👥 Usuários</button>
+            <button class="nav-tab" onclick="showTab('livros')">📘 Livros</button>
+            <button class="nav-tab" onclick="showTab('emprestimos')">🔗 Empréstimos</button>
+            <button class="nav-tab" onclick="showTab('relatorios')">📊 Relatórios</button>
+        </div>
+
+        <!-- Mensagem de Feedback -->
+        <div id="mensagem" class="mensagem"></div>
+
+        <!-- TAB: USUÁRIOS -->
+        <div id="tab-usuarios" class="tab-content active">
+            <section class="form-section">
+                <h3>➕ Cadastrar Novo Usuário</h3>
+                <form id="formCadastro">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nome">Nome Completo *</label>
+                            <input type="text" id="nome" name="nome" required 
+                                   minlength="1" maxlength="100" 
+                                   placeholder="Ex: João Silva">
+                        </div>
+                        <div class="form-group">
+                            <label for="matricula">Matrícula *</label>
+                            <input type="text" id="matricula" name="matricula" required 
+                                   minlength="5" maxlength="20" 
+                                   placeholder="Ex: ALU12345">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Usuário *</label>
+                            <select id="tipo" name="tipo" required>
+                                <option value="">Selecione...</option>
+                                <option value="ALUNO">🎓 Aluno</option>
+                                <option value="PROFESSOR">👨‍🏫 Professor</option>
+                                <option value="FUNCIONARIO">👔 Funcionário</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email (opcional)</label>
+                            <input type="email" id="email" name="email" 
+                                   placeholder="Ex: joao@email.com">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✅ Cadastrar Usuário</button>
+                </form>
+            </section>
+
+            <section class="list-section">
+                <h3>👥 Usuários Cadastrados ({{ usuarios|length }})</h3>
+                {% if usuarios %}
+                <div class="table-container">
+                    <table id="tabelaUsuarios">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Matrícula</th>
+                                <th>Tipo</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Data Registro</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                            <tr>
+                                <td><strong>#{{ usuario.id }}</strong></td>
+                                <td>{{ usuario.nome }}</td>
+                                <td><code>{{ usuario.matricula }}</code></td>
+                                <td>
+                                    <span class="badge badge-{{ usuario.tipo.value.lower() }}">
+                                        {% if usuario.tipo.value == 'ALUNO' %}🎓{% elif usuario.tipo.value == 'PROFESSOR' %}👨‍🏫{% else %}👔{% endif %}
+                                        {{ usuario.tipo.value }}
+                                    </span>
+                                </td>
+                                <td>{{ usuario.email or '—' }}</td>
+                                <td>
+                                    <span class="badge badge-status-{{ usuario.status.value.lower() }}">
+                                        {{ usuario.status.value }}
+                                    </span>
+                                </td>
+                                <td>{{ usuario.dataRegistro[:10] }}</td>
+                                <td>
+                                    <button class="btn btn-small btn-danger" 
+                                            onclick="removerUsuario({{ usuario.id }},'{{ usuario.nome }}')">
+                                        🗑️ Remover
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>📭 Nenhum usuário cadastrado ainda.</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <!-- TAB: LIVROS -->
+        <div id="tab-livros" class="tab-content">
+            <section class="form-section">
+                <h3>📘 Cadastrar Livro</h3>
+                <form id="formLivro">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="livro_id">ID *</label>
+                            <input type="number" id="livro_id" required min="1" placeholder="Ex: 1">
+                        </div>
+                        <div class="form-group">
+                            <label for="livro_titulo">Título *</label>
+                            <input type="text" id="livro_titulo" required placeholder="Ex: Dom Casmurro">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="livro_autor">Autor *</label>
+                            <input type="text" id="livro_autor" required placeholder="Ex: Machado de Assis">
+                        </div>
+                        <div class="form-group">
+                            <label for="livro_estoque">Estoque *</label>
+                            <input type="number" id="livro_estoque" required min="0" placeholder="Ex: 3">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">📥 Cadastrar Livro</button>
+                </form>
+            </section>
+
+            <section class="list-section">
+                <h3>📚 Catálogo de Livros</h3>
+                <div class="table-container">
+                    <table id="tabelaLivros">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Estoque</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB: EMPRÉSTIMOS -->
+        <div id="tab-emprestimos" class="tab-content">
+            <section class="form-section">
+                <h3>🔗 Empréstimo / Devolução</h3>
+                <form id="formEmprestimo">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="loan_user_id">Usuário ID *</label>
+                            <input type="number" id="loan_user_id" required min="1" placeholder="Ex: 1">
+                        </div>
+                        <div class="form-group">
+                            <label for="loan_book_id">Livro ID *</label>
+                            <input type="number" id="loan_book_id" required min="1" placeholder="Ex: 1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button type="button" class="btn btn-primary" onclick="criarEmprestimo()">📗 Emprestar</button>
+                        <button type="button" class="btn" onclick="registrarDevolucao()">↩️ Devolver</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="list-section">
+                <h3>📝 Empréstimos Registrados</h3>
+                <div class="table-container">
+                    <table id="tabelaLoans">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuário</th>
+                                <th>Livro</th>
+                                <th>Emprestado em</th>
+                                <th>Devolvido em</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB: RELATÓRIOS -->
+        <div id="tab-relatorios" class="tab-content">
+            <section class="form-section">
+                <h3>📊 Relatórios do Sistema</h3>
+                <div class="form-row">
+                    <button type="button" class="btn btn-primary" onclick="carregarRelatorioLivros()">
+                        📚 Livros Mais Emprestados
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="carregarRelatorioUsuarios()">
+                        👥 Usuários Mais Ativos
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="carregarStatusAcervo()">
+                        📊 Status do Acervo
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="carregarRelatorioDetalhado()">
+                        📋 Empréstimos Detalhados
+                    </button>
+                </div>
+            </section>
+
+            <section class="list-section">
+                <h3>Resultados</h3>
+                <div id="relatorios-container"></div>
+            </section>
+        </div>
+
+        <footer>
+            <p>🎓 Sistema de Biblioteca Integrado - TecLearn TABAJARA</p>
+            <p>Desenvolvido com integração de múltiplos módulos</p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab Navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Carregar dados da aba ao abrir
+            if (tabName === 'livros') carregarLivros();
+            if (tabName === 'emprestimos') carregarLoans();
+        }
+
+        // ========== USUÁRIOS ==========
+        
+        document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const dados = {
+                nome: document.getElementById('nome').value.trim(),
+                matricula: document.getElementById('matricula').value.trim(),
+                tipo: document.getElementById('tipo').value,
+                email: document.getElementById('email').value.trim() || null
+            };
+            
+            try {
+                const response = await fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                
+                if (response.ok) {
+                    const usuario = await response.json();
+                    mostrarMensagem(`✅ Usuário "${usuario.nome}" cadastrado com sucesso!`, 'sucesso');
+                    document.getElementById('formCadastro').reset();
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    const erro = await response.json();
+                    mostrarMensagem(`❌ Erro: ${erro.erro}`, 'erro');
+                }
+            } catch (error) {
+                mostrarMensagem('❌ Erro ao cadastrar usuário. Tente novamente.', 'erro');
+            }
+        });
+        
+        async function removerUsuario(id, nome) {
+            if (!confirm(`⚠️ Deseja realmente remover o usuário "${nome}"?`)) return;
+            
+            try {
+                const response = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
+                
+                if (response.ok) {
+                    mostrarMensagem(`✅ Usuário "${nome}" removido com sucesso!`, 'sucesso');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    const erro = await response.json();
+                    mostrarMensagem(`❌ Erro: ${erro.erro}`, 'erro');
+                }
+            } catch (error) {
+                mostrarMensagem('❌ Erro ao remover usuário.', 'erro');
+            }
+        }
+
+        // ========== LIVROS ==========
+        
+        async function carregarLivros() {
+            try {
+                const r = await fetch('/api/livros');
+                const livros = await r.json();
+                const tbody = document.querySelector('#tabelaLivros tbody');
+                tbody.innerHTML = '';
+                livros.forEach(l => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${l.id}</td>
+                        <td>${l.titulo}</td>
+                        <td>${l.autor}</td>
+                        <td>${l.estoque}</td>
+                        <td>${l.status}</td>
+                        <td><button class="btn btn-small btn-danger" onclick="removerLivro(${l.id})">🗑️ Remover</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {}
+        }
+
+        document.getElementById('formLivro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dados = {
+                id: parseInt(document.getElementById('livro_id').value, 10),
+                titulo: document.getElementById('livro_titulo').value.trim(),
+                autor: document.getElementById('livro_autor').value.trim(),
+                estoque: parseInt(document.getElementById('livro_estoque').value, 10)
+            };
+            try {
+                const r = await fetch('/api/livros', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                if (r.ok) {
+                    mostrarMensagem('✅ Livro cadastrado!', 'sucesso');
+                    e.target.reset();
+                    carregarLivros();
+                } else {
+                    const err = await r.json();
+                    mostrarMensagem(`❌ Erro: ${err.erro}`, 'erro');
+                }
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao cadastrar livro.', 'erro');
+            }
+        });
+
+        async function removerLivro(id) {
+            if (!confirm('Remover livro #' + id + '?')) return;
+            const r = await fetch('/api/livros/' + id, { method: 'DELETE' });
+            if (r.ok) {
+                mostrarMensagem('✅ Livro removido!', 'sucesso');
+                carregarLivros();
+            } else {
+                const err = await r.json();
+                mostrarMensagem(`❌ Erro: ${err.erro}`, 'erro');
+            }
+        }
+
+        // ========== EMPRÉSTIMOS ==========
+        
+        async function carregarLoans() {
+            try {
+                const r = await fetch('/api/emprestimos');
+                const loans = await r.json();
+                const tbody = document.querySelector('#tabelaLoans tbody');
+                tbody.innerHTML = '';
+                loans.forEach(l => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${l.loan_id}</td>
+                        <td>${l.user_id}</td>
+                        <td>${l.book_id}</td>
+                        <td>${(l.borrowed_at || '').replace('T',' ').slice(0,19)}</td>
+                        <td>${l.returned_at ? l.returned_at.replace('T',' ').slice(0,19) : '—'}</td>
+                        <td>${l.returned_at ? '<span class="badge">Devolvido</span>' : '<span class="badge" style="background:#fef3c7;color:#92400e">Em curso</span>'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {}
+        }
+
+        async function criarEmprestimo() {
+            const dados = {
+                user_id: parseInt(document.getElementById('loan_user_id').value, 10),
+                book_id: parseInt(document.getElementById('loan_book_id').value, 10)
+            };
+            try {
+                const r = await fetch('/api/emprestimos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                if (r.ok) {
+                    mostrarMensagem('✅ Empréstimo registrado!', 'sucesso');
+                    carregarLivros();
+                    carregarLoans();
+                } else {
+                    const err = await r.json();
+                    mostrarMensagem(`❌ Erro: ${err.erro}`, 'erro');
+                }
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao registrar empréstimo.', 'erro');
+            }
+        }
+
+        async function registrarDevolucao() {
+            const dados = {
+                user_id: parseInt(document.getElementById('loan_user_id').value, 10),
+                book_id: parseInt(document.getElementById('loan_book_id').value, 10)
+            };
+            try {
+                const r = await fetch('/api/devolucoes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                if (r.ok) {
+                    mostrarMensagem('✅ Devolução registrada!', 'sucesso');
+                    carregarLivros();
+                    carregarLoans();
+                } else {
+                    const err = await r.json();
+                    mostrarMensagem(`❌ Erro: ${err.erro}`, 'erro');
+                }
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao registrar devolução.', 'erro');
+            }
+        }
+
+        // ========== RELATÓRIOS ==========
+        
+        async function carregarRelatorioLivros() {
+            try {
+                const r = await fetch('/api/relatorios/livros-mais-emprestados');
+                const data = await r.json();
+                const container = document.getElementById('relatorios-container');
+                container.innerHTML = '<h4>📚 Livros Mais Emprestados</h4>';
+                if (data.length === 0) {
+                    container.innerHTML += '<p>Nenhum empréstimo registrado ainda.</p>';
+                    return;
+                }
+                let html = '<table><thead><tr><th>Título</th><th>Autor</th><th>Total</th></tr></thead><tbody>';
+                data.forEach(item => {
+                    html += `<tr><td>${item.titulo}</td><td>${item.autor}</td><td><strong>${item.totalEmprestimos}</strong></td></tr>`;
+                });
+                html += '</tbody></table>';
+                container.innerHTML += html;
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao carregar relatório.', 'erro');
+            }
+        }
+
+        async function carregarRelatorioUsuarios() {
+            try {
+                const r = await fetch('/api/relatorios/usuarios-mais-ativos');
+                const data = await r.json();
+                const container = document.getElementById('relatorios-container');
+                container.innerHTML = '<h4>👥 Usuários Mais Ativos</h4>';
+                if (data.length === 0) {
+                    container.innerHTML += '<p>Nenhum empréstimo registrado ainda.</p>';
+                    return;
+                }
+                let html = '<table><thead><tr><th>Nome</th><th>Matrícula</th><th>Total</th></tr></thead><tbody>';
+                data.forEach(item => {
+                    html += `<tr><td>${item.nome}</td><td>${item.matricula}</td><td><strong>${item.totalEmprestimos}</strong></td></tr>`;
+                });
+                html += '</tbody></table>';
+                container.innerHTML += html;
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao carregar relatório.', 'erro');
+            }
+        }
+
+        async function carregarStatusAcervo() {
+            try {
+                const r = await fetch('/api/relatorios/status-acervo');
+                const data = await r.json();
+                const container = document.getElementById('relatorios-container');
+                container.innerHTML = '<h4>📊 Status do Acervo</h4>';
+                container.innerHTML += `
+                    <div class="stats-section">
+                        <div class="stat-card"><div class="stat-number">${data.total}</div><div class="stat-label">Total</div></div>
+                        <div class="stat-card"><div class="stat-number">${data.disponivel}</div><div class="stat-label">Disponíveis</div></div>
+                        <div class="stat-card"><div class="stat-number">${data.emprestado}</div><div class="stat-label">Emprestados</div></div>
+                    </div>
+                `;
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao carregar relatório.', 'erro');
+            }
+        }
+
+        async function carregarRelatorioDetalhado() {
+            try {
+                const r = await fetch('/api/relatorios/emprestimos-detalhado');
+                const data = await r.json();
+                const container = document.getElementById('relatorios-container');
+                container.innerHTML = '<h4>📋 Empréstimos Detalhados</h4>';
+                if (data.length === 0) {
+                    container.innerHTML += '<p>Nenhum empréstimo registrado ainda.</p>';
+                    return;
+                }
+                let html = '<table><thead><tr><th>ID</th><th>Usuário</th><th>Livro</th><th>Status</th><th>Data Empréstimo</th><th>Data Devolução</th></tr></thead><tbody>';
+                data.forEach(item => {
+                    html += `<tr>
+                        <td>#${item.loan_id}</td>
+                        <td>${item.usuario.nome}<br><small>${item.usuario.matricula}</small></td>
+                        <td>${item.livro.titulo}<br><small>${item.livro.autor}</small></td>
+                        <td>${item.status === 'Devolvido' ? '<span class="badge">Devolvido</span>' : '<span class="badge" style="background:#fef3c7;color:#92400e">Em curso</span>'}</td>
+                        <td>${(item.borrowed_at || '').replace('T',' ').slice(0,19)}</td>
+                        <td>${item.returned_at ? item.returned_at.replace('T',' ').slice(0,19) : '—'}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                container.innerHTML += html;
+            } catch (e) {
+                mostrarMensagem('❌ Erro ao carregar relatório.', 'erro');
+            }
+        }
+
+        // Utilitários
+        
+        function mostrarMensagem(texto, tipo) {
+            const div = document.getElementById('mensagem');
+            div.textContent = texto;
+            div.className = `mensagem ${tipo}`;
+            div.style.display = 'block';
+            setTimeout(() => div.style.display = 'none', 5000);
+        }
+
+        // Inicialização
+        window.addEventListener('DOMContentLoaded', () => {
+            carregarLivros();
+            carregarLoans();
+        });
+    </script>
+</body>
+</html>
+
